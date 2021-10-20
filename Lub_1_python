@@ -1,0 +1,134 @@
+import zipfile
+import hashlib
+import requests
+import re
+import os
+
+# Задание №1
+directory_to_extract_to = "C:\\Users\\Георгий\\PycharmProjects\\pythonProject\\место_под_архив"
+arch_file = "C:\\Users\\Георгий\\Downloads\\tiff-4.2.0_lab1.zip"
+"""
+os.mkdir(directory_to_extract_to)
+
+test_zip = zipfile.ZipFile(arch_file)
+
+test_zip.extractall(directory_to_extract_to)
+
+test_zip.close()
+"""
+os.chdir(directory_to_extract_to)
+"""
+# Задание №2.1
+file = open("txt_files.txt", "w")
+
+for r, d, f in os.walk(os.getcwd()):
+    for i in f:
+        if(i.endswith('.txt')):
+            text = os.path.abspath(i) + '\n'
+            file.write(text)
+
+file.close()
+"""
+# Задание №2.2
+fl = open("txt_files.txt", "rb")
+
+for f in fl:
+    result = hashlib.md5(f).hexdigest()
+    print(result)
+fl.close()
+
+directory_to_extract_to = directory_to_extract_to + "\\"
+
+# Задание №3
+target_hash = '4636f9ae9fef12ebd56cd39586d33cfb'
+target_file = ''  # полный путь к искомому файлу
+target_file_data = ''  # содержимое искомого файла
+
+
+for r, d, f in os.walk(directory_to_extract_to):
+    for i in f:
+        if (i.endswith('.sh')):
+            file_tmp = open(r + '\\' + i, 'rb').read()
+            result = hashlib.md5(file_tmp).hexdigest()
+            if target_hash == result:
+                target_file = r + '\\' + i
+                target_file_data = open(target_file, 'r').read()
+                break
+
+print(target_file + '\n')
+print(target_file_data)
+
+
+# Задание №4
+r = requests.get(target_file_data)
+result_dct = {}  # словарь для записи содержимого таблицы
+
+
+# Получение списка строк таблицы
+lines = re.findall(r'<div class="Table-module_row__3TH83">.*?</div>.*?</div>.*?</div>.*?</div>.*?</div>', r.text)
+
+headers = re.sub("<.*?>", " ", lines[0])
+headers = re.sub("\  +", " ", headers)
+del lines[0]
+size = len(lines)-1
+counter = 0
+for line in lines:
+
+
+        # TODO
+
+    temp = re.sub("<.*?>", ';', line)
+    # Значения в таблице, заключенные в скобках, не учитывать. Для этого удалить скобки и символы между ними.
+    temp = re.sub(r'\(.+?\)', '', temp)
+    # Удаление смайлика (для конца, но можно все коды символов передать) СТРОЧКА НЕ РАБОТАЕТ
+    temp = re.sub(r'/\xF0\x9F\x93\x9D/u', '', temp)
+    # Замена последовательности символов ';' на одиночный символ
+    temp = re.sub("\;+", ';', temp)
+    # Удаление символа ';' в начале и в конце строки
+    temp = temp.strip(";")
+    # Разбитие строки на подстроки
+    tmp_split = temp.split(";")
+
+    if counter != size:  # вставка из за того что не получилось удалить смайлик
+        country_name = tmp_split[0]
+        country_name = country_name[country_name.find(" ") + 1:]
+        country_name = country_name[1:]
+    else:
+        del tmp_split[0]
+        country_name = tmp_split[0]
+
+    # Извлечение данных из оставшихся столбцов. Данные из этих столбцов должны иметь числовое значение (прочерк можно заменить на -1).
+    if tmp_split[3] == '0*':
+        tmp_split[3] = 0
+    if tmp_split[3] != '0' and tmp_split[3] != 0:
+        tmp_split[3] = re.sub('\xa0', "", tmp_split[3])
+    if tmp_split[4] == '_':
+        tmp_split[4] = -1
+    if tmp_split[4] != -1:
+        tmp_split[4] = re.sub('\xa0', "", tmp_split[4])
+    # Некоторые строки содержат пробелы в виде символа '\xa0'.
+    col1_val = (re.sub('\xa0', "", tmp_split[1]))
+    col2_val = (re.sub('\xa0', "", tmp_split[2]))
+    col3_val = (tmp_split[3])
+    col4_val = (tmp_split[4])
+
+    # Запись извлеченных данных в словарь
+    result_dct.update({country_name: (col1_val, col2_val, col3_val, col4_val)})
+    """
+    for key, value in result_dct.items():
+        print(key, ':', value)
+    """
+
+# Задание №5
+# Запись данных из полученного словаря в файл
+output = open('data.csv', 'w')
+for key, value in result_dct.items():
+    output.write(key + " ")
+    output.write(str(value) + "\n")
+# TODO
+output.close()
+
+# Задание №6
+#Вывод данных на экран для указанного первичного ключа (первый столбец таблицы)
+target_country = input("Введите название страны: ")
+print(result_dct.get(target_country))
