@@ -7,7 +7,7 @@ import os
 # Задание №1
 directory_to_extract_to = "C:\\Users\\Георгий\\PycharmProjects\\pythonProject\\место_под_архив"
 arch_file = "C:\\Users\\Георгий\\Downloads\\tiff-4.2.0_lab1.zip"
-"""
+
 os.mkdir(directory_to_extract_to)
 
 test_zip = zipfile.ZipFile(arch_file)
@@ -15,9 +15,9 @@ test_zip = zipfile.ZipFile(arch_file)
 test_zip.extractall(directory_to_extract_to)
 
 test_zip.close()
-"""
+
 os.chdir(directory_to_extract_to)
-"""
+
 # Задание №2.1
 file = open("txt_files.txt", "w")
 
@@ -28,7 +28,7 @@ for r, d, f in os.walk(os.getcwd()):
             file.write(text)
 
 file.close()
-"""
+
 # Задание №2.2
 fl = open("txt_files.txt", "rb")
 
@@ -101,10 +101,10 @@ for line in lines:
     col4_val = tmp_split[4]
 
     result_dct.update({country_name: (col1_val, col2_val, col3_val, col4_val)})
-    """
+    
     for key, value in result_dct.items():
         print(key, ':', value)
-    """
+    
 
 # Задание №5
 # Запись данных из полученного словаря в файл
