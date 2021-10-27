@@ -70,6 +70,9 @@ headers = re.sub("\  +", " ", headers)
 del lines[0]
 size = len(lines) - 1
 counter = 0
+head = headers.split(" ")
+del head[0]
+result_dct.update({"": (head[0], head[1], head[2], head[3]+" "+head[4])})
 for line in lines:
     temp = re.sub("<.*?>", ';', line)
     temp = re.sub(r'\(.+?\)', '', temp)
