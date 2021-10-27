@@ -63,14 +63,12 @@ print(target_file_data)
 r = requests.get(target_file_data)
 result_dct = {}
 
-
-
 lines = re.findall(r'<div class="Table-module_row__3TH83">.*?</div>.*?</div>.*?</div>.*?</div>.*?</div>', r.text)
 
 headers = re.sub("<.*?>", " ", lines[0])
 headers = re.sub("\  +", " ", headers)
 del lines[0]
-size = len(lines)-1
+size = len(lines) - 1
 counter = 0
 for line in lines:
     temp = re.sub("<.*?>", ';', line)
@@ -80,10 +78,10 @@ for line in lines:
     tmp_split = temp.split(";")
 
     if counter != size:
-        country_name = tmp_split[0]
+        del tmp_split[0]
         country_name = country_name[country_name.find(" ") + 1:]
-        country_name = country_name[1:]
     else:
+        del tmp_split[0]
         del tmp_split[0]
         country_name = tmp_split[0]
 
@@ -101,7 +99,7 @@ for line in lines:
     col4_val = tmp_split[4]
 
     result_dct.update({country_name: (col1_val, col2_val, col3_val, col4_val)})
-    
+    counter += 1
     for key, value in result_dct.items():
         print(key, ':', value)
     
