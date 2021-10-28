@@ -3,6 +3,7 @@ import hashlib
 import requests
 import re
 import os
+import csv
 
 # Задание №1
 directory_to_extract_to = "C:\\Users\\Георгий\\PycharmProjects\\pythonProject\\место_под_архив"
@@ -23,7 +24,7 @@ file = open("txt_files.txt", "w")
 
 for r, d, f in os.walk(os.getcwd()):
     for i in f:
-        if(i.endswith('.txt')):
+        if (i.endswith('.txt')):
             text = os.path.abspath(i) + '\n'
             file.write(text)
 
@@ -44,7 +45,6 @@ target_hash = '4636f9ae9fef12ebd56cd39586d33cfb'
 target_file = ''  # полный путь к искомому файлу
 target_file_data = ''  # содержимое искомого файла
 
-
 for r, d, f in os.walk(directory_to_extract_to):
     for i in f:
         if (i.endswith('.sh')):
@@ -57,7 +57,6 @@ for r, d, f in os.walk(directory_to_extract_to):
 
 print(target_file + '\n')
 print(target_file_data)
-
 
 # Задание №4
 r = requests.get(target_file_data)
@@ -72,7 +71,7 @@ size = len(lines) - 1
 counter = 0
 head = headers.split(" ")
 del head[0]
-result_dct.update({"": (head[0], head[1], head[2], head[3]+" "+head[4])})
+result_dct.update({"Заголовки": (head[0], head[1], head[2], head[3] + " " + head[4])})
 for line in lines:
     temp = re.sub("<.*?>", ';', line)
     temp = re.sub(r'\(.+?\)', '', temp)
@@ -82,7 +81,9 @@ for line in lines:
 
     if counter != size:
         del tmp_split[0]
+        country_name = tmp_split[0]
         country_name = country_name[country_name.find(" ") + 1:]
+        country_name = re.sub(" ", "", country_name)
     else:
         del tmp_split[0]
         del tmp_split[0]
@@ -105,16 +106,23 @@ for line in lines:
     counter += 1
     for key, value in result_dct.items():
         print(key, ':', value)
-    
 
 # Задание №5
 # Запись данных из полученного словаря в файл
+'''
 output = open('data.csv', 'w')
 for key, value in result_dct.items():
     output.write(key + " ")
     output.write(str(value) + "\n")
 output.close()
+'''
+output = open('data.csv', 'w')
+writer = csv.writer(output, delimiter=";")
+for key, val in result_dct.items():
+    writer.writerow([key, val[0], val[1], val[2], val[3]])
+output.close()
 
 # Задание №6
 target_country = input("Введите название страны: ")
+print(result_dct.get("Заголовки"))
 print(result_dct.get(target_country))
