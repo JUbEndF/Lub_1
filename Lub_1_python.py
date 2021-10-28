@@ -83,7 +83,6 @@ for line in lines:
         del tmp_split[0]
         country_name = tmp_split[0]
         country_name = country_name[country_name.find(" ") + 1:]
-        country_name = re.sub(" ", "", country_name)
     else:
         del tmp_split[0]
         del tmp_split[0]
